@@ -107,19 +107,6 @@ typedef struct {
 } RCC_reg_def_t;
 
 
-// Register-specific addresses
-#define GPIOA ((GPIO_reg_def_t*)GPIOA_BASE_ADDR)
-#define GPIOB ((GPIO_reg_def_t*)GPIOB_BASE_ADDR)
-#define GPIOC ((GPIO_reg_def_t*)GPIOC_BASE_ADDR)
-#define GPIOD ((GPIO_reg_def_t*)GPIOD_BASE_ADDR)
-#define GPIOE ((GPIO_reg_def_t*)GPIOE_BASE_ADDR)
-#define GPIOF ((GPIO_reg_def_t*)GPIOF_BASE_ADDR)
-#define GPIOG ((GPIO_reg_def_t*)GPIOG_BASE_ADDR)
-#define GPIOH ((GPIO_reg_def_t*)GPIOH_BASE_ADDR)
-
-#define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
-
-
 // CLOCK ENABLE MACROS
 
 // Clock enable macros for GPIOx peripherals
@@ -202,5 +189,15 @@ typedef struct {
 
 #define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
 
+// Generic macros
+
+#define ENABLE 1
+#define DISABLE 0
+
+#define SET ENABLE
+#define RESET DISABLE
+
+#define GPIO_PIN_SET SET
+#define GPIO_PIN_RESET RESET
 
 #endif /* INC_STM32F446XX_H_ */
