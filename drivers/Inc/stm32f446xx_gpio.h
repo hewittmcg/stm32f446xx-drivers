@@ -97,19 +97,20 @@ void gpio_init(GPIO_handle_t *p_GPIO_handle);
 // De-initialize -- reset all registers of the given GPIO register.
 void gpio_deinit(GPIO_reg_def_t *p_GPIOx);
 
-// Read from an input pin
+// Read from the given input pin, returning either 0 or 1.
 uint8_t gpio_read_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number);
 
-// Read from an input port
+// Read from the entire input port in the register; return the value read.
 uint16_t gpio_read_port(GPIO_reg_def_t *p_GPIOx);
 
-// Write to an output pin
+// Write the given value (must be either 0 or 1) to the given output register at the 
+// position given by pin_number.
 void gpio_write_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number, uint8_t value);
 
-// Write to an output port
+// Set the given register to the given value.
 void gpio_write_port(GPIO_reg_def_t *p_GPIOx, uint16_t value);
 
-// Toggle an output pin
+// Toggle the given output pin in the given output register.
 void gpio_toggle_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number);
 
 // Interrupt configuration

@@ -130,23 +130,37 @@ void gpio_deinit(GPIO_reg_def_t *p_GPIOx) {
 }
 
 uint8_t gpio_read_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number) {
+	uint8_t value;
+	// Get value from input register corresponding to pin 
+	value = (uint8_t)((p_GPIOx->IDR >> pin_number) & 0x1); 
 
+	return value;
 }
 
 uint16_t gpio_read_port(GPIO_reg_def_t *p_GPIOx) {
+	uint16_t value;
 
+	value = (uint16_t)p_GPIOx->IDR;
+
+	return value;
 }
 
 void gpio_write_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number, uint8_t value) {
-
+	if(value == GPIO_PIN_SET) {
+		// Write 1 to output data register at bitfield corresponding to pin number
+		p_GPIOx->ODR |= (1 << pin_number);
+	} else {
+		// Write 0 to output data register at bitfield corresponding to pin number
+		p_GPIOx->ODR &= ~(1 << pin_number);
+	}
 }
 
 void gpio_write_port(GPIO_reg_def_t *p_GPIOx, uint16_t value) {
-
+	p_GPIOx->ODR = value;
 }
 
 void gpio_toggle_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number) {
-
+	p_GPIOx->ODR ^= (1 << pin_number);
 }
 
 void gpio_irq_config(uint8_t IRQ_number, uint8_t IRQ_priority, uint8_t en_or_di) {
