@@ -8,20 +8,20 @@
 #define __vo volatile
 
 // Base addresses of Flash and SRAM memories
-#define FLASH_BASE_ADDR (uint32_t*) 0x08000000
-#define SRAM1_BASE_ADDR (uint32_t*) 0x20000000
-#define SRAM2_BASE_ADDR (uint32_t*) 0x2001C000
-#define ROM_BASE_ADDR (uint32_t*) 0x1FFF0000
+#define FLASH_BASE_ADDR (uint32_t) 0x08000000
+#define SRAM1_BASE_ADDR (uint32_t) 0x20000000
+#define SRAM2_BASE_ADDR (uint32_t) 0x2001C000
+#define ROM_BASE_ADDR (uint32_t) 0x1FFF0000
 
 // Only using SRAM1
 #define SRAM SRAM1_BASE_ADDR
 
 // AHBx and APHx bus peripheral base addresses
-#define PERIPH_BASE (uint32_t*) 0x40000000
+#define PERIPH_BASE (uint32_t) 0x40000000
 #define APB1_PERIPH_BASE PERIPH_BASE
-#define APB2_PERIPH_BASE (uint32_t*) 0x40010000
-#define AHB1_PERIPH_BASE (uint32_t*) 0x40020000
-#define AHB2_PERIPH_BASE (uint32_t*) 0x50000000
+#define APB2_PERIPH_BASE (uint32_t) 0x40010000
+#define AHB1_PERIPH_BASE (uint32_t) 0x40020000
+#define AHB2_PERIPH_BASE (uint32_t) 0x50000000
 
 // AHB1 bus peripherals
 #define GPIOA_BASE_ADDR (AHB1_PERIPH_BASE + 0x0000)
@@ -106,6 +106,7 @@ typedef struct {
 	__vo uint32_t DCKCFGR2; // RCC dedicated clock config 2
 } RCC_reg_def_t;
 
+#define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
 
 // CLOCK ENABLE MACROS
 
@@ -187,7 +188,7 @@ typedef struct {
 #define GPIOG ((GPIO_reg_def_t*)GPIOG_BASE_ADDR)
 #define GPIOH ((GPIO_reg_def_t*)GPIOH_BASE_ADDR)
 
-#define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
+
 
 // Macros to reset GPIO peripherals
 #define GPIOA_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 0)); (RCC->AHB1RSTR &= ~(1 << 0)); } while(0)
