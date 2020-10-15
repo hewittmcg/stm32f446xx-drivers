@@ -116,11 +116,13 @@ void gpio_init(GPIO_handle_t *p_GPIO_handle) {
 	p_GPIO_handle->p_GPIO_x->PUPDR |= temp; // Set bits
 	temp = 0;
 
-	// Configure output type
-	temp = p_GPIO_handle->pin_config.pin_op_type << (p_GPIO_handle->pin_config.pin_number);
-	p_GPIO_handle->p_GPIO_x->OTYPER &= ~(0x1 << p_GPIO_handle->pin_config.pin_number); // Clear bits
-	p_GPIO_handle->p_GPIO_x->OTYPER |= temp; // Set bits
-	temp = 0;
+	// Configure output type (only if pin is an output pin)
+	if(p_GPIO_handle->pin_config.pin_mode == GPIO_MODE_OUT) {
+		temp = p_GPIO_handle->pin_config.pin_op_type << (p_GPIO_handle->pin_config.pin_number);
+		p_GPIO_handle->p_GPIO_x->OTYPER &= ~(0x1 << p_GPIO_handle->pin_config.pin_number); // Clear bits
+		p_GPIO_handle->p_GPIO_x->OTYPER |= temp; // Set bits
+		temp = 0;
+	}
 
 	// Configure alternate functionality
 	if(p_GPIO_handle->pin_config.pin_mode == GPIO_MODE_ALTFN) {
@@ -218,7 +220,7 @@ void gpio_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di) {
 	}
 }
 
-void gpio_irq_priority_config(uint8_t IRQ_number, uint8_t IRQ_priority) {
+void gpio_irq_priority_config(uint8_t IRQ_number, uint32_t IRQ_priority) {
 	// Determine IPR register
 	uint8_t ipr = IRQ_number / 4;
 	uint8_t ipr_section = IRQ_number % 4;
@@ -226,7 +228,7 @@ void gpio_irq_priority_config(uint8_t IRQ_number, uint8_t IRQ_priority) {
 	// Jump to ipr register address and flip bits corresponding to priority 
 	// See p.g. 4-7 of generic user guide for more information
 	uint8_t shift_amt = (8 * ipr_section) + (8 - NUM_PR_BITS_IMPLEMENTED);
-	*(NVIC_PR_BASE_ADDR + (ipr * 4)) |= IRQ_priority << shift_amt;
+	*(NVIC_PR_BASE_ADDR + ipr) |= IRQ_priority << shift_amt;
 }
 
 void gpio_irq_handle(uint8_t pin_number) {
