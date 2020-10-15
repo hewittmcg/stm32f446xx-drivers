@@ -113,10 +113,13 @@ void gpio_write_port(GPIO_reg_def_t *p_GPIOx, uint16_t value);
 // Toggle the given output pin in the given output register.
 void gpio_toggle_pin(GPIO_reg_def_t *p_GPIOx, uint8_t pin_number);
 
-// Interrupt configuration
-void gpio_irq_config(uint8_t IRQ_number, uint8_t IRQ_priority, uint8_t en_or_di);
+// Interrupt configuration (processor side -- see Cortex-M4 Generic User Guide)
+void gpio_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di);
 
-// Process interrupt
+// Interrupt priority configuration (processor side -- see Cortex-M4 Generic User Guide)
+void gpio_irq_priority_config(uint8_t IRQ_number, uint8_t IRQ_priority);
+
+// Process interrupt 
 void gpio_irq_handle(uint8_t pin_number);
 
 

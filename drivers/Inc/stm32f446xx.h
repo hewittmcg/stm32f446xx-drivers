@@ -7,6 +7,41 @@
 
 #define __vo volatile
 
+
+// PROCESSOR-SPECIFIC DETAILS START 
+// See the Cortex-M4 Devices Generic User Guide for more information
+
+// Cortex-M4-specific register definitions
+#define NVIC_ISER0_MAX_PRIORITY 31
+#define NVIC_ISER1_MAX_PRIORITY 64
+#define NVIC_ISER2_MAX_PRIORITY 96
+
+// NVIC ISER register addresses
+#define NVIC_ISER0 ((__vo uint32_t*)0xE000E100)
+#define NVIC_ISER1 ((__vo uint32_t*)0xE000E104)
+#define NVIC_ISER2 ((__vo uint32_t*)0xE000E108)
+#define NVIC_ISER3 ((__vo uint32_t*)0xE000E10C)
+
+// Cortex-M4-specific register definitions
+#define NVIC_ICER0_MAX_PRIORITY 31
+#define NVIC_ICER1_MAX_PRIORITY 64
+#define NVIC_ICER2_MAX_PRIORITY 96
+
+// NVIC ICER register addresses
+#define NVIC_ICER0 ((__vo uint32_t*)0XE000E180)
+#define NVIC_ICER1 ((__vo uint32_t*)0XE000E184)
+#define NVIC_ICER2 ((__vo uint32_t*)0XE000E188)
+#define NVIC_ICER3 ((__vo uint32_t*)0XE000E18C)
+
+// Priority register address calculation (see p.g. 4-7 of generic user guide)
+#define NVIC_PR_BASE_ADDR ((__vo uint32_t*)0xE000E400)
+
+// Number of bits implemented in each 8-bit priority register
+#define NUM_PR_BITS_IMPLEMENTED 4
+
+// PROCESSOR-SPECIFIC DETAILS END
+
+
 // Base addresses of Flash and SRAM memories
 #define FLASH_BASE_ADDR (uint32_t) 0x08000000
 #define SRAM1_BASE_ADDR (uint32_t) 0x20000000
@@ -106,7 +141,26 @@ typedef struct {
 	__vo uint32_t DCKCFGR2; // RCC dedicated clock config 2
 } RCC_reg_def_t;
 
-#define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
+// EXTI register map (see p.g. 249 of reference manual)
+typedef struct {
+	__vo uint32_t IMR; // Interrupt mask
+	__vo uint32_t EMR; // Event mask
+	__vo uint32_t RTSR; // Rising trigger selection
+	__vo uint32_t FTSR; // Falling trigger selection
+	__vo uint32_t SWIER; // Software interrupt event
+	__vo uint32_t PR; // Pending
+} EXTI_reg_def_t;
+
+// SYSCFG register map (see p.g. 202 of reference manual)
+typedef struct {
+	__vo uint32_t MEMRMP; // Memory remap 
+	__vo uint32_t PMC; // Peripheral mode configuration
+	__vo uint32_t EXTICR[4]; // External interrupt registers 1-4 
+	uint32_t RESERVED_0[2];
+	__vo uint32_t CMPCR; // Compensation cell control
+	uint32_t RESERVED_1[2];
+	__vo uint32_t CFGR; // SYSCFG configuration
+} SYSCFG_reg_def_t;
 
 // CLOCK ENABLE MACROS
 
@@ -188,6 +242,12 @@ typedef struct {
 #define GPIOG ((GPIO_reg_def_t*)GPIOG_BASE_ADDR)
 #define GPIOH ((GPIO_reg_def_t*)GPIOH_BASE_ADDR)
 
+#define RCC ((RCC_reg_def_t*)RCC_BASE_ADDR)
+
+#define EXTI ((EXTI_reg_def_t*)EXTI_BASE_ADDR)
+
+#define SYSCFG ((SYSCFG_reg_def_t*)SYSCFG_BASE_ADDR)
+
 
 
 // Macros to reset GPIO peripherals
@@ -199,6 +259,24 @@ typedef struct {
 #define GPIOF_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 5)); (RCC->AHB1RSTR &= ~(1 << 5)); } while(0)
 #define GPIOG_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 6)); (RCC->AHB1RSTR &= ~(1 << 6)); } while(0)
 #define GPIOH_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 7)); (RCC->AHB1RSTR &= ~(1 << 7)); } while(0)
+
+#define GPIO_BASE_ADDR_TO_CODE(addr)   ((addr == GPIOA) ? 0 :\
+										(addr == GPIOB) ? 1 :\
+										(addr == GPIOC) ? 2 :\
+										(addr == GPIOD) ? 3 :\
+										(addr == GPIOE) ? 4 :\
+										(addr == GPIOF) ? 5 :\
+										(addr == GPIOG) ? 6 :\
+										(addr == GPIOH) ? 7 :0)
+
+// Interrupt request positions
+#define IRQ_POS_EXTI0 6
+#define IRQ_POS_EXTI1 7
+#define IRQ_POS_EXTI2 8
+#define IRQ_POS_EXTI3 9
+#define IRQ_POS_EXTI4 10
+#define IRQ_POS_EXTI9_5 23
+#define IRQ_POS_EXTI15_10 40
 
 // Generic macros
 
