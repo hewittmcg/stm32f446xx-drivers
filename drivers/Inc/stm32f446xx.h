@@ -83,6 +83,7 @@
 
 // APB2 bus peripherals
 #define SPI1_BASE_ADDR (APB2_PERIPH_BASE + 0x3000)
+#define SPI4_BASE_ADDR (APB2_PERIPH_BASE + 0x3400)
 #define USART1_BASE_ADDR (APB2_PERIPH_BASE + 0x1000)
 #define USART6_BASE_ADDR (APB2_PERIPH_BASE + 0x1400)
 #define EXTI_BASE_ADDR (APB2_PERIPH_BASE + 0x3C00)
@@ -162,6 +163,19 @@ typedef struct {
 	__vo uint32_t CFGR; // SYSCFG configuration
 } SYSCFG_reg_def_t;
 
+// SPI register map (see p.g. 896 of reference manual)
+typedef struct {
+	__vo uint32_t CR1; // Control register 1
+	__vo uint32_t CR2; // Control register 2
+	__vo uint32_t SR; // Status register
+	__vo uint32_t DR; // Data register
+	__vo uint32_t CRCPR; // CRC polynomial register
+	__vo uint32_t RXCRCR; // RX CRC register
+	__vo uint32_t TXCRCR; // TX CRC register
+	__vo uint32_t I2SCFGR; // I2S config register
+	__vo uint32_t I2SPR; // SPI_I2S prescaler register
+} SpiRegDef;
+
 // CLOCK ENABLE MACROS
 
 // Clock enable macros for GPIOx peripherals
@@ -181,8 +195,9 @@ typedef struct {
 
 // Clock enable macros for SPI peripherals
 #define SPI1_PCLK_EN() (RCC->APB2ENR |= (1 << 12))
-#define SPI2_PCLK_EN() (RCC->APB2ENR |= (1 << 14))
-#define SPI3_PCLK_EN() (RCC->APB2ENR |= (1 << 15))
+#define SPI2_PCLK_EN() (RCC->APB1ENR |= (1 << 14))
+#define SPI3_PCLK_EN() (RCC->APB1ENR |= (1 << 15))
+#define SPI4_PCLK_EN() (RCC->APB2ENR |= (1 << 13))
 
 // Clock enable macros for USART peripherals
 #define USART1_PCLK_EN() (RCC->APB2ENR |= (1 << 4))
@@ -216,8 +231,9 @@ typedef struct {
 
 // Clock disable macros for SPI peripherals
 #define SPI1_PCLK_DI() (RCC->APB2ENR &= ~(1 << 12))
-#define SPI2_PCLK_DI() (RCC->APB2ENR &= ~(1 << 14))
-#define SPI3_PCLK_DI() (RCC->APB2ENR &= ~(1 << 15))
+#define SPI2_PCLK_DI() (RCC->APB1ENR &= ~(1 << 14))
+#define SPI3_PCLK_DI() (RCC->APB1ENR &= ~(1 << 15))
+#define SPI4_PCLK_DI() (RCC->APB2ENR &= ~(1 << 13))
 
 // Clock disable macros for USART peripherals
 #define USART1_PCLK_DI() (RCC->APB2ENR &= ~(1 << 4))
@@ -247,6 +263,11 @@ typedef struct {
 #define EXTI ((EXTI_reg_def_t*)EXTI_BASE_ADDR)
 
 #define SYSCFG ((SYSCFG_reg_def_t*)SYSCFG_BASE_ADDR)
+
+#define SPI1 ((SpiRegDef*)SPI1_BASE_ADDR);
+#define SPI2 ((SpiRegDef*)SPI2_BASE_ADDR);
+#define SPI3 ((SpiRegDef*)SPI3_BASE_ADDR);
+#define SPI4 ((SpiRegDef*)SPI4_BASE_ADDR);
 
 
 
