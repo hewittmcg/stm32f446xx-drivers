@@ -88,7 +88,7 @@ typedef enum {
 
 // Set up the GPIO peripheral clock
 // Takes in pointer to the base address of the GPIO register
-//and whether to enable or disable the clock for that register
+// and whether to enable or disable the clock for that register
 void gpio_pclk_control(GPIO_reg_def_t *p_GPIOx, uint8_t en_or_di);
 
 // Initialize the given GPIO pin with the given settings.

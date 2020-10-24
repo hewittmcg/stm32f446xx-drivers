@@ -264,10 +264,10 @@ typedef struct {
 
 #define SYSCFG ((SYSCFG_reg_def_t*)SYSCFG_BASE_ADDR)
 
-#define SPI1 ((SpiRegDef*)SPI1_BASE_ADDR);
-#define SPI2 ((SpiRegDef*)SPI2_BASE_ADDR);
-#define SPI3 ((SpiRegDef*)SPI3_BASE_ADDR);
-#define SPI4 ((SpiRegDef*)SPI4_BASE_ADDR);
+#define SPI1 ((SpiRegDef*)SPI1_BASE_ADDR)
+#define SPI2 ((SpiRegDef*)SPI2_BASE_ADDR)
+#define SPI3 ((SpiRegDef*)SPI3_BASE_ADDR)
+#define SPI4 ((SpiRegDef*)SPI4_BASE_ADDR)
 
 
 
@@ -280,6 +280,12 @@ typedef struct {
 #define GPIOF_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 5)); (RCC->AHB1RSTR &= ~(1 << 5)); } while(0)
 #define GPIOG_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 6)); (RCC->AHB1RSTR &= ~(1 << 6)); } while(0)
 #define GPIOH_REG_RESET() do { (RCC->AHB1RSTR |= (1 << 7)); (RCC->AHB1RSTR &= ~(1 << 7)); } while(0)
+
+// Macros to reset SPI peripherals 
+#define SPI1_REG_RESET() do { (RCC->APB2RSTR |= (1 << 12)); (RCC->APB2RSTR &= ~(1 << 12)); } while(0)
+#define SPI2_REG_RESET() do { (RCC->APB1RSTR |= (1 << 14)); (RCC->APB1RSTR &= ~(1 << 14)); } while(0)
+#define SPI3_REG_RESET() do { (RCC->APB1RSTR |= (1 << 15)); (RCC->APB1RSTR &= ~(1 << 15)); } while(0)
+#define SPI4_REG_RESET() do { (RCC->APB2RSTR |= (1 << 13)); (RCC->APB2RSTR &= ~(1 << 13)); } while(0)
 
 #define GPIO_BASE_ADDR_TO_CODE(addr)   ((addr == GPIOA) ? 0 :\
 										(addr == GPIOB) ? 1 :\
