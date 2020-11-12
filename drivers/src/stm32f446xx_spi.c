@@ -81,7 +81,36 @@ void spi_deinit(SpiRegDef *p_spi_reg) {
     }
 }
 
-void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len);
+// Return the status of the flag passed in
+static uint8_t prv_spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type) {
+	if(p_spi_reg->SR & flag_type) {
+		return FLAG_SET;
+	} else {
+		return FLAG_RESET;	
+	}
+}
+
+void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len) {
+	while(len > 0) {
+		// wait for TXE to be set
+		while(prv_spi_get_flag_status(p_spi_reg, SPI_TXE_FLAG) == FLAG_RESET);
+
+		// check for DFF bit in CR1
+		if(p_spi_reg->CR1 & (1 << SPI_CR1_DFF)) {
+			// 16-bit DFF
+			// Load data into DR
+			p_spi_reg->DR = *((uint16_t*)p_tx_buffer);
+			len -= 2; 
+			(uint16_t*)p_tx_buffer++;
+		} else {
+			// 8-bit DFF
+			// Load data into DR
+			p_spi_reg->DR = *p_tx_buffer;
+			len--;
+			p_tx_buffer++;
+		}
+	}
+}
 
 void spi_receive(SpiRegDef *p_spi_reg, uint8_t *p_rx_buffer, uint32_t len);
 

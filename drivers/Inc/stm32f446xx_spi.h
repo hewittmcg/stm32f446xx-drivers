@@ -90,6 +90,11 @@ typedef struct {
 } SpiHandle;
 
 
+// Status flags, definitions
+#define SPI_TXE_FLAG (1 << SPI_SR_TXE)
+#define SPI_RXNE_FLAG (1 << SPI_SR_RXNE)
+#define SPI_BUSY_FLAG (1 << SPI_SR_BSY)
+
 // Driver API
 
 // Set up the SPI perhiperal clock
@@ -103,7 +108,8 @@ void spi_init(SpiHandle *p_spi_handle);
 // De-initialize -- reset all registers of the given SPI register.
 void spi_deinit(SpiRegDef *p_spi_reg);
 
-// TX
+// Send data over SPI.  p_tx_buffer points to an array of bytes to be sent.
+// Note: this is a blocking call.
 void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len);
 
 // RX 

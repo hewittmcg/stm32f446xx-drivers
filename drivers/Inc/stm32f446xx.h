@@ -375,4 +375,7 @@ typedef enum {
 #define GPIO_PIN_SET SET
 #define GPIO_PIN_RESET RESET
 
+#define FLAG_SET SET
+#define FLAG_RESET RESET
+
 #endif /* INC_STM32F446XX_H_ */
