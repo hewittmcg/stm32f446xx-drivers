@@ -326,6 +326,44 @@ typedef enum {
 	NUM_NVIC_IRQ_PRIORITIES
 } NvicIrqPriority;
 
+// SPI bit position definitions
+// Control register 1 (see p.g. 886 of reference manual)
+#define SPI_CR1_BIDIMODE 15 // Bidirectional data mode enable
+#define SPI_CR1_BIDIOE 14 // Output enable in bidirectional mode 
+#define SPI_CR1_CRCEN 13 // HW CRC calculation 
+#define SPI_CR1_CRCNEXT 12 // CRC transfer next
+#define SPI_CR1_DFF 11 // Data frame format
+#define SPI_CR1_RXONLY 10 // RX-only enable
+#define SPI_CR1_SSM 9 // Software slave management 
+#define SPI_CR1_SSI 8 // Internal slave select
+#define SPI_CR1_LSBFIRST 7 // Frame format 
+#define SPI_CR1_SPE 6 // SPI enable
+#define SPI_CR1_BR 3 // Baud rate control
+#define SPI_CR1_BR_SIZE 3 
+#define SPI_CR1_MSTR 2 // For device mode config
+#define SPI_CR1_CPOL 1
+#define SPI_CR1_CPHA 0
+
+// Control register 2 (see p.g. 888 of reference manual)
+#define SPI_CR2_TXEIE 7 // TX buffer empty interrupt enable
+#define SPI_CR2_RXNEIE 6 // RX buffer non-empty interrupt enable
+#define SPI_CR2_ERRIE 5 // Error interrupt enable
+#define SPI_CR2_FRF 4 // Frame format
+#define SPI_CR2_SSOE 2 // SS output enable
+#define SPI_CR2_TXDMAEN 1 // TX buffer DMA enable
+#define SPI_CR2_RXDMAEN 0 // RX buffer DMA enable
+
+// SPI status register (see p.g. 889 of reference manual)
+#define SPI_SR_FRE 8 // Frame error
+#define SPI_SR_BSY 7 // Busy flag
+#define SPI_SR_OVR 6 // Overrun flag
+#define SPI_SR_MODF 5 // Mode fault
+#define SPI_SR_CRCERR 4 // CRC error flag
+#define SPI_SR_UDR 3 // Underrun flag
+#define SPI_SR_CHSIDE 2 // Channel side
+#define SPI_SR_TXE 1 // Transmit buffer empty
+#define SPI_SR_RXNE 0 // Receive buffer not empty
+
 // Generic macros
 
 #define ENABLE 1

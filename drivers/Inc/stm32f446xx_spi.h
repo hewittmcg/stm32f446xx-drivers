@@ -13,6 +13,7 @@
 #include "stm32f446xx.h"
 
 // Config structure for SPI peripherals
+// TODO: change types to their respective enums
 typedef struct {
     uint8_t device_mode; // Master/slave config
     uint8_t bus_config; // Full duplex/half duplex/simplex
@@ -23,11 +24,71 @@ typedef struct {
     uint8_t ssm; // SW/HW slave management config
 } SpiConfig;
 
+// Device modes
+typedef enum {
+    SPI_DEVICE_MODE_SLAVE = 0, 
+    SPI_DEVICE_MODE_MASTER, 
+    NUM_SPI_DEVICE_MODES,
+} SpiDeviceMode;
+
+// Bus config modes 
+// Note: use full duplex for simplex TX only configurations
+typedef enum {
+    SPI_BUS_CONFIG_FD = 0, // Full duplex
+    SPI_BUS_CONFIG_HD, // Half duplex
+    SPI_BUS_CONFIG_S_RXONLY, // Simplex, RX only
+    NUM_SPI_BUS_CONFIGS,
+} SpiBusConfig;
+
+// Sclk speeds (see p.g. 887 of reference manual)
+// Each speed represents a ratio of the system PCLK:
+// SPI_SCLK_SPEED_DIV_2 = f(PCLK) / 2 and so on
+typedef enum {
+    SPI_SCLK_SPEED_DIV_2 = 0,
+    SPI_SCLK_SPEED_DIV_4,
+    SPI_SCLK_SPEED_DIV_8,
+    SPI_SCLK_SPEED_DIV_16,
+    SPI_SCLK_SPEED_DIV_32,
+    SPI_SCLK_SPEED_DIV_64,
+    SPI_SCLK_SPEED_DIV_128,
+    SPI_SCLK_SPEED_DIV_256,
+    NUM_SPI_SCLK_SPEEDS,
+} SpiSclkSpeed;
+
+// DFF formats
+typedef enum {
+    SPI_DFF_FORMAT_8_BIT = 0, 
+    SPI_DFF_FORMAT_16_BIT, 
+    NUM_SPI_DFF_FORMATS,
+} SpiDffFormat;
+
+// CPOL 
+typedef enum {
+    SPI_CPOL_LOW = 0, 
+    SPI_CPOL_HIGH, 
+    NUM_SPI_COPLS,
+} SpiCpol;
+
+// CPHA
+typedef enum {
+    SPI_CPHA_LOW = 0, 
+    SPI_CPHA_HIGH, 
+    NUM_SPI_CPHAS,
+} SpiCpha;
+
+// SSM SW config
+typedef enum {
+    SPI_SSM_CONFIG_DI = 0, 
+    SPI_SSM_CONFIG_EN, 
+    NUM_SPI_SSM_CONFIGS,
+} SpiSsmConfig;
+
 // Handle structure for SPI peripherals 
 typedef struct {
     SpiRegDef *p_spi_reg; // Holds base address of SPI peripheral
     SpiConfig spi_config;
 } SpiHandle;
+
 
 // Driver API
 
