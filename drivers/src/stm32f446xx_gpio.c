@@ -63,6 +63,9 @@ void gpio_pclk_control(GPIO_reg_def_t *p_GPIOx, uint8_t en_or_di) {
 void gpio_init(GPIO_handle_t *p_GPIO_handle) {
 	// Configure mode of GPIO pin
 	uint32_t temp = 0; // temp register
+
+	// Enable peripheral clock
+	gpio_pclk_control(p_GPIO_handle->p_GPIO_x, ENABLE);
 	
 	if(p_GPIO_handle->pin_config.pin_mode <= GPIO_MODE_ANALOG) {
 		// Non-interrupt mode

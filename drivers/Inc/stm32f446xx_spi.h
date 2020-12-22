@@ -124,4 +124,9 @@ void spi_irq_priority_config(uint8_t IRQ_number, uint32_t IRQ_priority);
 // Process interrupt 
 void spi_irq_handle(SpiHandle *p_handle);
 
+// Other periperal control APIs
+
+// Enable/disable SPI peripheral
+void spi_peripheral_control(SpiRegDef *p_spi_reg, uint8_t en_or_di);
+
 #endif /* INC_STM32F446XX_SPI_H_ */

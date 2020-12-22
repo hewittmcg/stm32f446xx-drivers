@@ -33,6 +33,9 @@ void spi_init(SpiHandle *p_spi_handle) {
 	// Configure device mode (see p.g. 886 of reference manual)
 	uint32_t temp_reg = 0;
 
+	// Enable peripheral clock
+	spi_pclk_control(p_spi_handle->p_spi_reg, ENABLE);
+
 	// Configure device mode
 	temp_reg |= (p_spi_handle->spi_config.device_mode << SPI_CR1_MSTR);
 	
@@ -66,7 +69,6 @@ void spi_init(SpiHandle *p_spi_handle) {
 
 	// Set CR1 register
 	p_spi_handle->p_spi_reg->CR1 = temp_reg;
-
 }
 
 void spi_deinit(SpiRegDef *p_spi_reg) {
@@ -119,3 +121,11 @@ void spi_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di);
 void spi_irq_priority_config(uint8_t IRQ_number, uint32_t IRQ_priority);
 
 void spi_irq_handle(SpiHandle *p_handle);
+
+void spi_peripheral_control(SpiRegDef *p_spi_reg, uint8_t en_or_di) {
+	if(en_or_di ==  ENABLE) {
+		p_spi_reg->CR1 |= (1 << SPI_CR1_SPE);
+	} else {
+		p_spi_reg->CR1 &= ~(1 << SPI_CR1_SPE);
+	}
+}
