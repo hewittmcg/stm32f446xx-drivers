@@ -129,4 +129,7 @@ void spi_irq_handle(SpiHandle *p_handle);
 // Enable/disable SPI peripheral
 void spi_peripheral_control(SpiRegDef *p_spi_reg, uint8_t en_or_di);
 
+// Enable/disable SSI
+void spi_ssi_config(SpiRegDef *p_spi_reg, uint8_t en_or_di);
+
 #endif /* INC_STM32F446XX_SPI_H_ */

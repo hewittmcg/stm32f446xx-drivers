@@ -61,8 +61,12 @@ int main(void) {
 	
 	spi2_init();
 
+	// pull NSS high internally to avoid MODF error
+	spi_ssi_config(SPI2, ENABLE);
+
 	// enable SPI2 peripheral
 	spi_peripheral_control(SPI2, ENABLE);
+	
 	char test_data[] = "hello world";
 
 	spi_send(SPI2, (uint8_t*)test_data, strlen(test_data));

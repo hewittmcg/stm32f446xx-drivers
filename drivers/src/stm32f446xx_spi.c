@@ -129,3 +129,11 @@ void spi_peripheral_control(SpiRegDef *p_spi_reg, uint8_t en_or_di) {
 		p_spi_reg->CR1 &= ~(1 << SPI_CR1_SPE);
 	}
 }
+
+void spi_ssi_config(SpiRegDef *p_spi_reg, uint8_t en_or_di) {
+	if(en_or_di ==  ENABLE) {
+		p_spi_reg->CR1 |= (1 << SPI_CR1_SSI);
+	} else {
+		p_spi_reg->CR1 &= ~(1 << SPI_CR1_SSI);
+	}
+}
