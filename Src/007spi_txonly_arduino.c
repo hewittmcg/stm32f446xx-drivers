@@ -25,7 +25,7 @@ void spi2_gpio_init(void) {
 			.pin_mode = GPIO_MODE_ALTFN,
 			.pin_altfn_mode = 5,
 			.pin_op_type = GPIO_OP_TYPE_PP, 
-			.pin_pu_pd_control = GPIO_NO_PUPD,
+			.pin_pu_pd_control = GPIO_PIN_PU,
 			.pin_speed = GPIO_SPEED_FAST,
 		},
 	};
@@ -93,8 +93,8 @@ int main(void) {
 	uint8_t data_size = strlen(test_data);
 
     while(1) {
-        // wait in busy loop for pin to be pressed
-        while(!gpio_read_pin(GPIOC, GPIO_PIN_13));
+        // wait in busy loop for pin to be pulled low on button press
+        while(gpio_read_pin(GPIOC, GPIO_PIN_13));
         prv_delay();
         
         // enable SPI2 peripheral
