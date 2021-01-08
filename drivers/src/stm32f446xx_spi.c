@@ -84,7 +84,7 @@ void spi_deinit(SpiRegDef *p_spi_reg) {
 }
 
 // Return the status of the flag passed in
-static uint8_t prv_spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type) {
+uint8_t spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type) {
 	if(p_spi_reg->SR & flag_type) {
 		return FLAG_SET;
 	} else {
@@ -95,7 +95,7 @@ static uint8_t prv_spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type)
 void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len) {
 	while(len > 0) {
 		// wait for TXE to be set
-		while(prv_spi_get_flag_status(p_spi_reg, SPI_TXE_FLAG) == FLAG_RESET);
+		while(spi_get_flag_status(p_spi_reg, SPI_TXE_FLAG) == FLAG_RESET);
 
 		// check for DFF bit in CR1
 		if(p_spi_reg->CR1 & (1 << SPI_CR1_DFF)) {
@@ -135,5 +135,13 @@ void spi_ssi_config(SpiRegDef *p_spi_reg, uint8_t en_or_di) {
 		p_spi_reg->CR1 |= (1 << SPI_CR1_SSI);
 	} else {
 		p_spi_reg->CR1 &= ~(1 << SPI_CR1_SSI);
+	}
+}
+
+void spi_ssoe_config(SpiRegDef *p_spi_reg, uint8_t en_or_di) {
+	if(en_or_di ==  ENABLE) {
+		p_spi_reg->CR2 |= (1 << SPI_CR2_SSOE);
+	} else {
+		p_spi_reg->CR2 &= ~(1 << SPI_CR2_SSOE);
 	}
 }

@@ -71,6 +71,12 @@ int main(void) {
 
 	spi_send(SPI2, (uint8_t*)test_data, strlen(test_data));
 
+	// ensure SPI isn't busy
+		while(spi_get_flag_status(SPI2, SPI_BUSY_FLAG));
+
+	// disable SPI2 peripheral
+	spi_peripheral_control(SPI2, DISABLE);
+
 	while(1);
 
 	return 0;

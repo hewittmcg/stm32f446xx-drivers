@@ -108,6 +108,9 @@ void spi_init(SpiHandle *p_spi_handle);
 // De-initialize -- reset all registers of the given SPI register.
 void spi_deinit(SpiRegDef *p_spi_reg);
 
+// Return the status of the requested flag.
+uint8_t spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type);
+
 // Send data over SPI.  p_tx_buffer points to an array of bytes to be sent.
 // Note: this is a blocking call.
 void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len);
@@ -131,5 +134,8 @@ void spi_peripheral_control(SpiRegDef *p_spi_reg, uint8_t en_or_di);
 
 // Enable/disable SSI
 void spi_ssi_config(SpiRegDef *p_spi_reg, uint8_t en_or_di);
+
+// Enable/disable SSOE
+void spi_ssoe_config(SpiRegDef *p_spi_reg, uint8_t en_or_di);
 
 #endif /* INC_STM32F446XX_SPI_H_ */
