@@ -114,7 +114,27 @@ void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len) {
 	}
 }
 
-void spi_receive(SpiRegDef *p_spi_reg, uint8_t *p_rx_buffer, uint32_t len);
+void spi_receive(SpiRegDef *p_spi_reg, uint8_t *p_rx_buffer, uint32_t len) {
+	while(len > 0) {
+		// wait for RXNE to be set
+		while(spi_get_flag_status(p_spi_reg, SPI_RXNE_FLAG) == FLAG_RESET);
+
+		// check for DFF bit in CR1
+		if(p_spi_reg->CR1 & (1 << SPI_CR1_DFF)) {
+			// 16-bit DFF
+			// Load data from DR into RX buffer
+			*((uint16_t*)p_rx_buffer) = p_spi_reg->DR;
+			len -= 2; 
+			(uint16_t*)p_rx_buffer++;
+		} else {
+			// 8-bit DFF
+			// Load data into DR
+			*((uint16_t*)p_rx_buffer) = p_spi_reg->DR;
+			len--;
+			p_rx_buffer++;
+		}
+	}
+}
 
 void spi_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di);
 
