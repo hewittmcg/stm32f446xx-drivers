@@ -39,6 +39,9 @@
 // constitutes an ACK
 #define SPI_VERIFY_RESPONSE(ack_byte) ((ack_byte) == ARDUINO_ACK)
 
+// Length of board ID
+#define BOARD_ID_SIZE 10
+
 
 // Rough software delay
 static void prv_delay(void) {
@@ -110,7 +113,8 @@ void gpio_button_init(void) {
 // This function also enables SPI2.
 static void prv_send_cmd_led_ctrl(void) {
     uint8_t command_code = COMMAND_LED_CTRL;
-    uint8_t ack_byte, dummy_read, dummy_write;
+    uint8_t ack_byte, dummy_read;
+    uint8_t dummy_write = 0xFF;
     uint8_t args[2];
 
     // wait for button press
@@ -142,7 +146,8 @@ static void prv_send_cmd_led_ctrl(void) {
 // Send CMD_SENSOR_READ (read from analog pin 0)
 static void prv_send_cmd_sensor_read(void) {
     uint8_t command_code = COMMAND_SENSOR_READ;
-    uint8_t ack_byte, dummy_read, dummy_write;
+    uint8_t ack_byte, dummy_read;
+    uint8_t dummy_write = 0xFF;
     uint8_t args[2];
 
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
@@ -180,7 +185,8 @@ static void prv_send_cmd_sensor_read(void) {
 // Send CMD_LED_READ to read the status of an LED connected to the Arduino
 static void prv_send_cmd_led_read(void) {
     uint8_t command_code = COMMAND_LED_READ;
-    uint8_t ack_byte, dummy_read, dummy_write;
+    uint8_t ack_byte, dummy_read;
+    uint8_t dummy_write = 0xFF;
     uint8_t args[2];
 
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
@@ -216,6 +222,67 @@ static void prv_send_cmd_led_read(void) {
     }
 }
 
+// Send a message to be printed by the Arduino.
+static void prv_send_cmd_print(void) {
+    uint8_t command_code = COMMAND_PRINT;
+    uint8_t ack_byte, dummy_read;
+    uint8_t dummy_write = 0xFF;
+
+    char msg[] = "Message from STM32";
+    uint8_t msg_size = strlen(msg);
+
+    while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    prv_delay();
+
+    spi_send(SPI2, &command_code, 1);
+
+    // dummy read to empty RX buffer and clear RXNE
+    spi_receive(SPI2, &dummy_read, 1);
+
+    // process ACK/NACK
+    // send dummy byte to fetch response from slave
+    spi_send(SPI2, &dummy_write, 1);
+    spi_receive(SPI2, &ack_byte, 1);
+    
+    // If ACK OK, send message size followed by message
+    if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        spi_send(SPI2, &msg_size, 1);
+
+        spi_send(SPI2, (uint8_t*)msg, msg_size);
+    }
+}
+
+// Receive the ID of the Arduino over SPI.
+static void prv_send_cmd_id_read(void) {
+    uint8_t command_code = COMMAND_ID_READ;
+    uint8_t ack_byte, dummy_read;
+    uint8_t dummy_write = 0xFF;
+    char board_id[BOARD_ID_SIZE]; 
+    while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    prv_delay();
+
+    spi_send(SPI2, &command_code, 1);
+
+    // dummy read to empty RX buffer and clear RXNE
+    spi_receive(SPI2, &dummy_read, 1);
+
+    // process ACK/NACK
+    // send dummy byte to fetch response from slave
+    spi_send(SPI2, &dummy_write, 1);
+    spi_receive(SPI2, &ack_byte, 1);
+    
+    // If ACK OK, send other arguments to read from analog pin 0
+    if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        // continue fetching the board ID until no response given
+        for(uint8_t i = 0; i < BOARD_ID_SIZE; i++) {
+            // send dummy byte to fetch response from slave
+            spi_send(SPI2, &dummy_write, 1);
+            spi_receive(SPI2, &(board_id[i]), 1);
+        }
+    }
+    prv_delay();
+}
+
 int main(void) {
 	gpio_button_init();
 
@@ -232,6 +299,10 @@ int main(void) {
         prv_send_cmd_sensor_read();
 
         prv_send_cmd_led_read();
+
+        prv_send_cmd_print();
+
+        prv_send_cmd_id_read();
 
 		// ensure SPI isn't busy
 		while(spi_get_flag_status(SPI2, SPI_BUSY_FLAG));
