@@ -163,19 +163,18 @@ static void prv_send_cmd_sensor_read(void) {
         args[0] = ANALOG_PIN0;
 
         spi_send(SPI2, args, 1);
+        // dummy read to empty RX buffer and clear RXNE
+        spi_receive(SPI2, &dummy_read, 1);
+
+        // delay for slave to get data
+        prv_delay();
+
+        // send dummy byte to fetch response from slave
+        spi_send(SPI2, &dummy_write, 1);
+
+        uint8_t analog_data;
+        spi_receive(SPI2, &analog_data, 1);
     }
-
-    // dummy read to empty RX buffer and clear RXNE
-    spi_receive(SPI2, &dummy_read, 1);
-
-    // delay for slave to get data
-    prv_delay();
-
-    // send dummy byte to fetch response from slave
-    spi_send(SPI2, &dummy_write, 1);
-
-    uint8_t analog_data;
-    spi_receive(SPI2, &analog_data, 1);
 }
 
 // Send CMD_LED_READ to read the status of an LED connected to the Arduino
@@ -202,19 +201,19 @@ static void prv_send_cmd_led_read(void) {
         args[0] = LED_PIN;
 
         spi_send(SPI2, args, 1);
+
+        // dummy read to empty RX buffer and clear RXNE
+        spi_receive(SPI2, &dummy_read, 1);
+
+        // delay for slave to get data
+        prv_delay();
+
+        // send dummy byte to fetch response from slave
+        spi_send(SPI2, &dummy_write, 1);
+
+        uint8_t led_data;
+        spi_receive(SPI2, &led_data, 1);
     }
-
-    // dummy read to empty RX buffer and clear RXNE
-    spi_receive(SPI2, &dummy_read, 1);
-
-    // delay for slave to get data
-    prv_delay();
-
-    // send dummy byte to fetch response from slave
-    spi_send(SPI2, &dummy_write, 1);
-
-    uint8_t led_data;
-    spi_receive(SPI2, &led_data, 1);
 }
 
 int main(void) {
