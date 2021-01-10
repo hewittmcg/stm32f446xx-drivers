@@ -120,14 +120,13 @@ int main(void) {
     spi_ssoe_config(SPI2, ENABLE);
 
     while(1) {
-        // wait in busy loop for pin to be pulled low on button press
+        // Send CMD_LED_CTRL:
         while(gpio_read_pin(GPIOC, GPIO_PIN_13));
         prv_delay();
         
         // enable SPI2 peripheral
         spi_peripheral_control(SPI2, ENABLE);
 
-		// send CMD_LED_CTRL
         uint8_t command_code = COMMAND_LED_CTRL;
         uint8_t ack_byte;
         uint8_t args[2];
@@ -149,6 +148,40 @@ int main(void) {
 
            spi_send(SPI2, args, 2);
         }
+
+        // Send CMD_SENSOR_READ:
+        while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+        prv_delay();
+
+        command_code = COMMAND_SENSOR_READ;
+
+        spi_send(SPI2, &command_code, 1);
+
+        // dummy read to empty RX buffer and clear RXNE
+        spi_receive(SPI2, &dummy_read, 1);
+
+        // process ACK/NACK
+        // send dummy byte to fetch response from slave
+        spi_send(SPI2, &dummy_write, 1);
+        spi_receive(SPI2, &ack_byte, 1);
+        
+        // If ACK OK, send other arguments to read from analog pin 0
+        if(SPI_VERIFY_RESPONSE(ack_byte)) {
+           args[0] = ANALOG_PIN0;
+
+           spi_send(SPI2, args, 1);
+        }
+
+        // dummy read to empty RX buffer and clear RXNE
+        spi_receive(SPI2, &dummy_read, 1);
+
+        // delay for slave to get data
+        prv_delay();
+        // send dummy byte to fetch response from slave
+        spi_send(SPI2, &dummy_write, 1);
+
+        uint8_t analog_data;
+        spi_receive(SPI2, &analog_data, 1);
 
 		// ensure SPI isn't busy
 		while(spi_get_flag_status(SPI2, SPI_BUSY_FLAG));
