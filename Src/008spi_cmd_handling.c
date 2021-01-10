@@ -123,6 +123,7 @@ static void prv_send_cmd_led_ctrl(void) {
 
     // wait for button press
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    printf("Sending CMD_LED_CTRL\n");
     prv_delay();
     
     // enable SPI2 peripheral
@@ -140,6 +141,7 @@ static void prv_send_cmd_led_ctrl(void) {
     
     // If ACK OK, send other arguments to turn on/off LED
     if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        printf("ACK OK\n");
         args[0] = LED_PIN;
         args[1] = LED_OFF;
 
@@ -155,6 +157,7 @@ static void prv_send_cmd_sensor_read(void) {
     uint8_t args[2];
 
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    printf("Sending CMD_SENSOR_READ\n");
     prv_delay();
 
     spi_send(SPI2, &command_code, 1);
@@ -169,6 +172,7 @@ static void prv_send_cmd_sensor_read(void) {
     
     // If ACK OK, send other arguments to read from analog pin 0
     if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        printf("ACK OK\n");
         args[0] = ANALOG_PIN0;
 
         spi_send(SPI2, args, 1);
@@ -183,6 +187,7 @@ static void prv_send_cmd_sensor_read(void) {
 
         uint8_t analog_data;
         spi_receive(SPI2, &analog_data, 1);
+        printf("Analog data: %d\n", analog_data);
     }
 }
 
@@ -194,6 +199,7 @@ static void prv_send_cmd_led_read(void) {
     uint8_t args[2];
 
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    printf("Sending CMD_LED_READ\n");
     prv_delay();
 
     spi_send(SPI2, &command_code, 1);
@@ -223,6 +229,7 @@ static void prv_send_cmd_led_read(void) {
 
         uint8_t led_data;
         spi_receive(SPI2, &led_data, 1);
+        printf("LED data: %d\n", led_data);
     }
 }
 
@@ -236,6 +243,7 @@ static void prv_send_cmd_print(void) {
     uint8_t msg_size = strlen(msg);
 
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    printf("Sending CMD_PRINT\n");
     prv_delay();
 
     spi_send(SPI2, &command_code, 1);
@@ -250,6 +258,7 @@ static void prv_send_cmd_print(void) {
     
     // If ACK OK, send message size followed by message
     if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        printf("ACK OK\n");
         spi_send(SPI2, &msg_size, 1);
 
         spi_send(SPI2, (uint8_t*)msg, msg_size);
@@ -262,7 +271,9 @@ static void prv_send_cmd_id_read(void) {
     uint8_t ack_byte, dummy_read;
     uint8_t dummy_write = 0xFF;
     char board_id[BOARD_ID_SIZE]; 
+    
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    printf("Sending CMD_ID_READ\n");
     prv_delay();
 
     spi_send(SPI2, &command_code, 1);
@@ -277,21 +288,22 @@ static void prv_send_cmd_id_read(void) {
     
     // If ACK OK, send other arguments to read from analog pin 0
     if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        printf("ACK OK\n");
         // continue fetching the board ID until no response given
         for(uint8_t i = 0; i < BOARD_ID_SIZE; i++) {
             // send dummy byte to fetch response from slave
             spi_send(SPI2, &dummy_write, 1);
             spi_receive(SPI2, &(board_id[i]), 1);
         }
+        printf("ID: %s\n", board_id);
     }
-    prv_delay();
 }
 
 int main(void) {
     // for semihosting
     initialise_monitor_handles();
 
-    printf("testing\n");
+    printf("Starting setup...\n");
 	gpio_button_init();
 
 	spi2_gpio_init();
@@ -300,6 +312,8 @@ int main(void) {
 
     // enable NSS output by setting SSOE to 1
     spi_ssoe_config(SPI2, ENABLE);
+    
+    printf("SPI and GPIO initialized\n");
 
     while(1) {
         prv_send_cmd_led_ctrl();
