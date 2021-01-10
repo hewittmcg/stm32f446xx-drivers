@@ -106,7 +106,7 @@ void gpio_button_init(void) {
     gpio_init(&button);
 }
 
-// Send CMD_LED_CTRL (turn on LED at pin LED_PIN)
+// Send CMD_LED_CTRL (turn off LED at pin LED_PIN)
 // This function also enables SPI2.
 static void prv_send_cmd_led_ctrl(void) {
     uint8_t command_code = COMMAND_LED_CTRL;
@@ -133,7 +133,7 @@ static void prv_send_cmd_led_ctrl(void) {
     // If ACK OK, send other arguments to turn on/off LED
     if(SPI_VERIFY_RESPONSE(ack_byte)) {
         args[0] = LED_PIN;
-        args[1] = LED_ON;
+        args[1] = LED_OFF;
 
         spi_send(SPI2, args, 2);
     }
@@ -178,6 +178,45 @@ static void prv_send_cmd_sensor_read(void) {
     spi_receive(SPI2, &analog_data, 1);
 }
 
+// Send CMD_LED_READ to read the status of an LED connected to the Arduino
+static void prv_send_cmd_led_read(void) {
+    uint8_t command_code = COMMAND_LED_READ;
+    uint8_t ack_byte, dummy_read, dummy_write;
+    uint8_t args[2];
+
+    while(gpio_read_pin(GPIOC, GPIO_PIN_13));
+    prv_delay();
+
+    spi_send(SPI2, &command_code, 1);
+
+    // dummy read to empty RX buffer and clear RXNE
+    spi_receive(SPI2, &dummy_read, 1);
+
+    // process ACK/NACK
+    // send dummy byte to fetch response from slave
+    spi_send(SPI2, &dummy_write, 1);
+    spi_receive(SPI2, &ack_byte, 1);
+    
+    // If ACK OK, send argument with pin to read
+    if(SPI_VERIFY_RESPONSE(ack_byte)) {
+        args[0] = LED_PIN;
+
+        spi_send(SPI2, args, 1);
+    }
+
+    // dummy read to empty RX buffer and clear RXNE
+    spi_receive(SPI2, &dummy_read, 1);
+
+    // delay for slave to get data
+    prv_delay();
+
+    // send dummy byte to fetch response from slave
+    spi_send(SPI2, &dummy_write, 1);
+
+    uint8_t led_data;
+    spi_receive(SPI2, &led_data, 1);
+}
+
 int main(void) {
 	gpio_button_init();
 
@@ -192,6 +231,8 @@ int main(void) {
         prv_send_cmd_led_ctrl();
 
         prv_send_cmd_sensor_read();
+
+        prv_send_cmd_led_read();
 
 		// ensure SPI isn't busy
 		while(spi_get_flag_status(SPI2, SPI_BUSY_FLAG));
