@@ -2,6 +2,10 @@
 #include "stm32f446xx_spi.h"
 
 #include <string.h>
+#include <stdio.h>
+
+// For semihosting
+extern void initialise_monitor_handles(void);
 
 // FW to test SPI communication between STM32 master and Arduino slave
 
@@ -284,6 +288,10 @@ static void prv_send_cmd_id_read(void) {
 }
 
 int main(void) {
+    // for semihosting
+    initialise_monitor_handles();
+
+    printf("testing\n");
 	gpio_button_init();
 
 	spi2_gpio_init();
