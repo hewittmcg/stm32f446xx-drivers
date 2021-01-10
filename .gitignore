@@ -3,3 +3,4 @@ Debug/
 .settings/
 RemoteSystemsTempFiles/
 *.launch
+stm32f446xx-drivers Debug.cfg

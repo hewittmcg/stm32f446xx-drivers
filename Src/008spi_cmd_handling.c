@@ -270,7 +270,7 @@ static void prv_send_cmd_id_read(void) {
     uint8_t command_code = COMMAND_ID_READ;
     uint8_t ack_byte, dummy_read;
     uint8_t dummy_write = 0xFF;
-    char board_id[BOARD_ID_SIZE]; 
+    char board_id[BOARD_ID_SIZE + 1]; 
     
     while(gpio_read_pin(GPIOC, GPIO_PIN_13));
     printf("Sending CMD_ID_READ\n");
@@ -295,6 +295,9 @@ static void prv_send_cmd_id_read(void) {
             spi_send(SPI2, &dummy_write, 1);
             spi_receive(SPI2, &(board_id[i]), 1);
         }
+        // append null-terminating char
+        board_id[BOARD_ID_SIZE] = '\0';
+        
         printf("ID: %s\n", board_id);
     }
 }
