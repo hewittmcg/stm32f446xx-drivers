@@ -3,6 +3,10 @@
 
 #include <string.h>
 
+// For semihosting
+extern void initialise_monitor_handles();
+
+
 // Code to send a string over SPI to an Arduino slave
 // when the onboard button is pressed
 

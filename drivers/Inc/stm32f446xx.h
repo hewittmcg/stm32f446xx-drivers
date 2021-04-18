@@ -4,8 +4,10 @@
 #define INC_STM32F446XX_H_
 
 #include<stdint.h>
+#include<stddef.h>
 
 #define __vo volatile
+#define __weak __attribute__((weak))
 
 
 // PROCESSOR-SPECIFIC DETAILS START 
@@ -297,13 +299,17 @@ typedef struct {
 										(addr == GPIOH) ? 7 :0)
 
 // Interrupt request positions
-#define IRQ_POS_EXTI0 6
+#define IRQ_POS_EXTI0 6	
 #define IRQ_POS_EXTI1 7
 #define IRQ_POS_EXTI2 8
 #define IRQ_POS_EXTI3 9
 #define IRQ_POS_EXTI4 10
 #define IRQ_POS_EXTI9_5 23
+#define IRQ_POS_SPI1 35
+#define IRQ_POS_SPI2 36
 #define IRQ_POS_EXTI15_10 40
+#define IRQ_POS_SPI3 51
+#define IRQ_POS_SPI4 84
 
 // NVIC IRQ priorities 
 typedef enum {
@@ -377,5 +383,8 @@ typedef enum {
 
 #define FLAG_SET SET
 #define FLAG_RESET RESET
+
+#define STATUS_SUCCESS 0
+#define STATUS_FAILED 1
 
 #endif /* INC_STM32F446XX_H_ */

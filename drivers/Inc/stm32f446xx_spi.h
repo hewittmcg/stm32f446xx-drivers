@@ -87,6 +87,13 @@ typedef enum {
 typedef struct {
     SpiRegDef *p_spi_reg; // Holds base address of SPI peripheral
     SpiConfig spi_config;
+    // For use with interrupt-configured SPI:
+    uint8_t *p_tx_buffer; // Application TX buffer address
+    uint8_t *p_rx_buffer; // Application RX buffer address
+    uint32_t tx_len;
+    uint32_t rx_len;
+    uint8_t tx_state;
+    uint8_t rx_state;
 } SpiHandle;
 
 
@@ -94,6 +101,23 @@ typedef struct {
 #define SPI_TXE_FLAG (1 << SPI_SR_TXE)
 #define SPI_RXNE_FLAG (1 << SPI_SR_RXNE)
 #define SPI_BUSY_FLAG (1 << SPI_SR_BSY)
+
+// SPI application states
+typedef enum {
+    SPI_STATE_READY = 0,
+    SPI_STATE_BUSY_RX,
+    SPI_STATE_BUSY_TX,
+    NUM_SPI_STATES,
+} SpiState;
+
+// SPI application events
+typedef enum {
+    SPI_EVENT_TX_DONE = 0,
+    SPI_EVENT_RX_DONE,
+    SPI_EVENT_OVR_ERR,
+    SPI_EVENT_CRC_ERR,
+    NUM_SPI_EVENTS,
+} SpiEvent;
 
 // Driver API
 
@@ -111,12 +135,28 @@ void spi_deinit(SpiRegDef *p_spi_reg);
 // Return the status of the requested flag.
 uint8_t spi_get_flag_status(SpiRegDef *p_spi_reg, uint32_t flag_type);
 
+// Clear the OVR flag.
+void spi_clear_ovr_flag(SpiRegDef *p_spi_reg);
+
+// End SPI transmission.
+void spi_end_tx(SpiHandle *p_spi_handle);
+
+// End SPI reception.
+void spi_end_rx(SpiHandle *p_spi_handle);
+
 // Send data over SPI.  p_tx_buffer points to an array of bytes to be sent.
 // Note: this is a blocking call.
 void spi_send(SpiRegDef *p_spi_reg, uint8_t *p_tx_buffer, uint32_t len);
 
 // RX 
 void spi_receive(SpiRegDef *p_spi_reg, uint8_t *p_rx_buffer, uint32_t len);
+
+// Same functions, but interrupt-based and non-blocking:
+// Return STATUS_SUCCESS if successful, STATUS_FAILED if SPI busy
+uint8_t spi_send_it(SpiHandle *p_spi_handle, uint8_t *p_tx_buffer, uint32_t len);
+
+uint8_t spi_receive_it(SpiHandle *p_spi_handle, uint8_t *p_rx_buffer, uint32_t len);
+
 
 // Interrupt configuration (processor side -- see Cortex-M4 Generic User Guide)
 void spi_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di);
@@ -137,5 +177,11 @@ void spi_ssi_config(SpiRegDef *p_spi_reg, uint8_t en_or_di);
 
 // Enable/disable SSOE
 void spi_ssoe_config(SpiRegDef *p_spi_reg, uint8_t en_or_di);
+
+
+// Application callback:
+
+// Must be implemented by the application
+void spi_app_event_cb(SpiHandle *p_spi_handle, uint8_t event);
 
 #endif /* INC_STM32F446XX_SPI_H_ */
