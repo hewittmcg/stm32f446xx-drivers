@@ -418,7 +418,7 @@ typedef enum {
 // Control register 2 (see p.g. 782 of reference manual)
 typedef enum {
 	I2C_CR2_FREQ = 0, 
-	// FREQ takes up bits 1-5
+	// FREQ bits 0-5
 	// Bits 6-7 reserved
 	I2C_CR2_ITERREN = 8, // Error interrupt enable
 	I2C_CR2_ITEVTEN, // Event interrupt enable
@@ -430,13 +430,46 @@ typedef enum {
 
 // Status register 1 (see p.g. 785 of reference manual)
 typedef enum {
-
+	I2C_SR1_SB = 0, // Start bit (master mode)
+	I2C_SR1_ADDR, // Address sent (master)/matched (slave)
+	I2C_SR1_BTF, // Byte transfer finished
+	I2C_SR1_ADD10, // 10-bit header sent (master)
+	I2C_SR1_STOPF, // Stop detection (slave)
+	// Bit 5 reserved
+	I2C_SR1_RXNE = 6, // Data register not empty (receivers)
+	I2C_SR1_TXE, // Data register empty (transmitters)
+	I2C_SR1_BERR, // Bus error
+	I2C_SR1_ARLO, // Arbitration lost (master)
+	I2C_SR1_AF, // Ack fail
+	I2C_SR1_OVR, // Overrun/underrun
+	I2C_SR1_PECERR, // PEC error in reception
+	// Bit 13 reserved
+	I2C_SR1_TIMEOUT = 14, // Timeout or Tlow error
+	I2C_SR1_SMBALERT, // SMBus alert
 } I2cSr1Bit;
 
 // Status register 2 (see p.g. 789 of reference manual)
 typedef enum {
-
+	I2C_SR2_MSL = 0, // Master/slave
+	I2C_SR2_BUSY, // Bus busy
+	I2C_SR2_TRA, // Transmitter/receiver
+	// Bit 3 reserved
+	I2C_SR2_GENCALL = 4, // General call address (slave)
+	I2C_SR2_SMBDEFAULT, // SMBus default address (slave)
+	I2C_SR2_SMBHOST, // SMBus host header (slave)
+	I2C_SR2_DUALF, // DUal flag (slave)
+	I2C_SR2_PEC, // Packet error checking register
+	// PEC bits 8-15
 } I2cSr2Bit;
+
+// Clock control register (see p.g. 790 of reference manual)
+typedef enum {
+	I2C_CCR_CCR = 0, // Clock control register
+	// CCR bits 0-11
+	// Bits 12-13 reserved
+	I2C_CCR_DUTY = 14, // Fm mode duty cycle
+	I2C_CCR_FS, // I2C master mode selection
+} I2cCcrBit;
 
 // Generic macros
 
