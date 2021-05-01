@@ -178,6 +178,20 @@ typedef struct {
 	__vo uint32_t I2SPR; // SPI_I2S prescaler register
 } SpiRegDef;
 
+// I2C register map (see p.g. 793 of reference manual)
+typedef struct {
+	__vo uint32_t CR1; // Control register 1
+	__vo uint32_t CR2; // Control register 2
+	__vo uint32_t OAR1; // Own address register 1
+	__vo uint32_t OAR2; // Own address register 2
+	__vo uint32_t DR; // Data register
+	__vo uint32_t SR1; // Status register 1
+	__vo uint32_t SR2; // Status register 2
+	__vo uint32_t CCR; // Clock control register
+	__vo uint32_t TRISE; // TRISE register
+	__vo uint32_t FLTR; // Filter register
+} I2cRegDef;
+
 // CLOCK ENABLE MACROS
 
 // Clock enable macros for GPIOx peripherals
@@ -271,6 +285,10 @@ typedef struct {
 #define SPI3 ((SpiRegDef*)SPI3_BASE_ADDR)
 #define SPI4 ((SpiRegDef*)SPI4_BASE_ADDR)
 
+#define I2C1 ((I2cRegDef*)I2C1_BASE_ADDR)
+#define I2C2 ((I2cRegDef*)I2C2_BASE_ADDR)
+#define I2C3 ((I2cRegDef*)I2C3_BASE_ADDR)
+
 
 
 // Macros to reset GPIO peripherals
@@ -288,6 +306,12 @@ typedef struct {
 #define SPI2_REG_RESET() do { (RCC->APB1RSTR |= (1 << 14)); (RCC->APB1RSTR &= ~(1 << 14)); } while(0)
 #define SPI3_REG_RESET() do { (RCC->APB1RSTR |= (1 << 15)); (RCC->APB1RSTR &= ~(1 << 15)); } while(0)
 #define SPI4_REG_RESET() do { (RCC->APB2RSTR |= (1 << 13)); (RCC->APB2RSTR &= ~(1 << 13)); } while(0)
+
+// Macros to reset I2C peripherals
+#define I2C1_REG_RESET() do { (RCC->APB1RSTR |= (1 << 21)); (RCC->APB1RSTR &= ~(1 << 21)); } while(0)
+#define I2C2_REG_RESET() do { (RCC->APB1RSTR |= (1 << 22)); (RCC->APB1RSTR &= ~(1 << 22)); } while(0)
+#define I2C3_REG_RESET() do { (RCC->APB1RSTR |= (1 << 23)); (RCC->APB1RSTR &= ~(1 << 23)); } while(0)
+
 
 #define GPIO_BASE_ADDR_TO_CODE(addr)   ((addr == GPIOA) ? 0 :\
 										(addr == GPIOB) ? 1 :\
@@ -369,6 +393,50 @@ typedef enum {
 #define SPI_SR_CHSIDE 2 // Channel side
 #define SPI_SR_TXE 1 // Transmit buffer empty
 #define SPI_SR_RXNE 0 // Receive buffer not empty
+
+// I2C bit position definitions
+// Control register 1 (see p.g. 780 of reference manual)
+typedef enum {
+	I2C_CR1_PE = 0, // Peripheral enable
+	I2C_CR1_SMBUS, // SMBus mode
+	// Bit 2 reserved
+	I2C_CR1_SMBTYPE = 3, // SMBus type
+	I2C_CR1_ENARP, // ARP enable
+	I2C_CR1_ENPEC, // PEC enable
+	I2C_CR1_ENGC, // General call enable
+	I2C_CR1_NOSTRETCH, // Clock stretching disable (slave)
+	I2C_CR1_START, // Start generation
+	I2C_CR1_STOP, // Stop generation
+	I2C_CR1_ACK, // Acknowledge enable
+	I2C_CR1_POS, // Ack/PEC position
+	I2C_CR1_PEC, // Packet error checking
+	I2C_CR1_ALERT, // SMBus alert
+	// Bit 14 reserved
+	I2C_CR1_SWRST = 15,
+} I2cCr1Bit;
+
+// Control register 2 (see p.g. 782 of reference manual)
+typedef enum {
+	I2C_CR2_FREQ = 0, 
+	// FREQ takes up bits 1-5
+	// Bits 6-7 reserved
+	I2C_CR2_ITERREN = 8, // Error interrupt enable
+	I2C_CR2_ITEVTEN, // Event interrupt enable
+	I2C_CR2_ITBUFEN, // Buffer interrupt enable
+	I2C_CR2_DMAEN, // DMA requests enable
+	I2C_CR2_LAST, // DMA last transfer
+	// Bits 13-15 reserved
+} I2cCr2Bit;
+
+// Status register 1 (see p.g. 785 of reference manual)
+typedef enum {
+
+} I2cSr1Bit;
+
+// Status register 2 (see p.g. 789 of reference manual)
+typedef enum {
+
+} I2cSr2Bit;
 
 // Generic macros
 
