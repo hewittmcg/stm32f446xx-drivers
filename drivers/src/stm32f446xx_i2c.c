@@ -130,6 +130,72 @@ void i2c_deinit(I2cRegDef *p_i2c_reg) {
     }
 }
 
+// Generate the START condition
+static void prv_i2c_gen_start(I2cRegDef *p_i2c_reg) {
+    p_i2c_reg->CR1 |= (1 << I2C_CR1_START);
+}
+
+// Send address of slave with r/nw bit set to 0 (WRITE)
+static void prv_i2c_send_addr(I2cRegDef *p_i2c_reg, uint8_t addr) {
+    // Shift up to make space for r/w bit
+    addr = addr << 1;
+
+    // Clear r/w bit
+    addr &= ~(1);
+    p_i2c_reg->DR = addr;
+}
+
+// Clear the ADDR flag by reading SR1 and SR2
+static void prv_i2c_clear_addr_flag(I2cRegDef *p_i2c_reg) {
+    uint32_t dummy_read = p_i2c_reg->SR1;
+    dummy_read = p_i2c_reg->SR2;
+    (void)dummy_read; // avoid unused error
+}
+
+// Generate STOP condition
+static void prv_i2c_gen_stop(I2cRegDef *p_i2c_reg) {
+    p_i2c_reg->CR1 |= (1 << I2C_CR1_START);
+}
+
+void i2c_master_send(I2cHandle *p_i2c_handle, uint8_t *tx_buf, uint32_t len, uint8_t slave_addr) {
+    // Generate START condition
+    prv_i2c_gen_start(p_i2c_handle->p_i2c_reg);
+
+    // Confirm start generation complete by checking whether SB flag cleared
+    uint8_t flag = (1 << I2C_SR1_SB);
+    while(i2c_get_flag_status(p_i2c_handle->p_i2c_reg, flag)); 
+
+    prv_i2c_send_addr(p_i2c_handle->p_i2c_reg, p_i2c_handle->i2c_config.addr);
+
+    prv_i2c_clear_addr_flag(p_i2c_handle->p_i2c_reg);
+
+    // Send data until len == 0
+    while(len > 0) {
+        // Wait for TXE to be set
+        while(!i2c_get_flag_status(p_i2c_handle->p_i2c_reg, (1 << I2C_SR1_TXE)));
+        
+        p_i2c_handle->p_i2c_reg->DR = *tx_buf;
+        tx_buf++;
+        len--;
+    }
+
+    // Transmission finished -- close communication
+    // Wait for TXE=1 and BTF=1 to represent that SR, DR both empty
+    while(!i2c_get_flag_status(p_i2c_handle->p_i2c_reg, (1 << I2C_SR1_TXE)));
+    while(!i2c_get_flag_status(p_i2c_handle->p_i2c_reg, (1 << I2C_SR1_BTF)));
+
+    // Generate stop condition
+    prv_i2c_gen_stop(p_i2c_handle->p_i2c_reg);
+}
+
+uint8_t i2c_get_flag_status(I2cRegDef *p_i2c_reg, uint32_t flag_type) {
+    if(p_i2c_reg->SR1 & flag_type) {
+        return FLAG_SET;
+    } else {
+        return FLAG_RESET;
+    }
+}
+
 void i2c_irq_interrupt_config(uint8_t IRQ_number, uint8_t en_or_di) {
     if(en_or_di == ENABLE) {
 		if(IRQ_number <= NVIC_ISER0_MAX_PRIORITY) {
