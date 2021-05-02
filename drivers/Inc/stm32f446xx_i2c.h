@@ -41,6 +41,10 @@ typedef struct {
 #define I2C_SCL_SPEED_SM 100000 // 100 kHz
 #define I2C_SCL_SPEED_FM 400000 // 400 kHz
 
+// TRISE defs
+#define I2C_TRISE_MAX_SM 1000
+#define I2C_TRISE_MAX_FM 300
+
 // ACK EN/DI (see CCR register)
 #define I2C_ACK_DI 0
 #define I2C_ACK_EN 1

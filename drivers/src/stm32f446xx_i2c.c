@@ -1,14 +1,7 @@
-/*
- * stm32f446xx_i2c.c
- *
- *  Created on: May 13, 2021
- *      Author: Hewitt
- */
-
 #include "stm32f446xx_i2c.h"
 
 #define HZ_TO_MHZ 1000000U
-
+#define S_TO_NS 1000000000U
 
 void i2c_pclk_control(I2cRegDef *p_i2c_reg, uint8_t en_or_di) {
     if(en_or_di == ENABLE) {
@@ -98,7 +91,7 @@ void i2c_init(I2cHandle *p_i2c_handle) {
     // NOTE: this needs to be refactored
     uint16_t ccr_val = 0;
     uint32_t temp_ccr = 0;
-    if(p_i2c_handle->i2c_config.speed < I2C_SCL_SPEED_SM) {
+    if(p_i2c_handle->i2c_config.speed <= I2C_SCL_SPEED_SM) {
         // Standard mode
         // Assume Tlow = Thigh
         ccr_val = prv_rcc_get_pclk1() / (2 *p_i2c_handle->i2c_config.speed);
@@ -117,7 +110,18 @@ void i2c_init(I2cHandle *p_i2c_handle) {
     temp_ccr |= (ccr_val &0xFFF); // 12 LSB only
     p_i2c_handle->p_i2c_reg->CCR = temp_ccr;
 
-    // Configure rise time for I2C pins (TODO)
+    // Configure rise time for I2C pins
+    uint32_t temp_trise = 0;
+    if(p_i2c_handle->i2c_config.speed <= I2C_SCL_SPEED_SM) {
+        // Standard mode
+        temp_trise = (prv_rcc_get_pclk1() * I2C_TRISE_MAX_SM / S_TO_NS) + 1;
+    } else {
+        // Fast mode
+        temp_trise = (prv_rcc_get_pclk1() * I2C_TRISE_MAX_FM / S_TO_NS) + 1;
+    }
+
+    // Only care about 6 LSB
+    p_i2c_handle->p_i2c_reg->TRISE = (temp_trise & 0b111111);
 }
 
 void i2c_deinit(I2cRegDef *p_i2c_reg) {
