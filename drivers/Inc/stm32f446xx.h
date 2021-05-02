@@ -91,6 +91,10 @@
 #define EXTI_BASE_ADDR (APB2_PERIPH_BASE + 0x3C00)
 #define SYSCFG_BASE_ADDR (APB2_PERIPH_BASE + 0x3800)
 
+// Clock speeds
+#define CLK_SPEED_HSI 16000000 // 16 mHz
+#define CLK_SPEED_HSE 0 // Externally-connected, must be defined
+
 // Peripheral register definitions
 
 // GPIO register map
@@ -427,6 +431,10 @@ typedef enum {
 	I2C_CR2_LAST, // DMA last transfer
 	// Bits 13-15 reserved
 } I2cCr2Bit;
+
+// Own address 1 register see p.g. 748 of reference manual
+
+// Own address 2 register see p.g. 749 of reference manual
 
 // Status register 1 (see p.g. 785 of reference manual)
 typedef enum {
